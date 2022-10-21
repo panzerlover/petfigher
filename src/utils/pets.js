@@ -1,33 +1,45 @@
-import { snipe } from "./abilities";
+import { addHealthOnFaint, explodeOnFaint, gainAttackOnHurt, snipe } from "./abilities";
 
 class Pet {
-    constructor(hp, atk, ability, place, food = null){
+    hitCount = 0;
+    constructor(hp = 1, atk = 1, ability, place, level = 1, food = null){
         this.hp = hp;
         this.atk = atk;
         this.ability = ability;
         this.place = place;
+        this.level = level;
         this.food = food;
+        food.effect(this);
     }
     attack(target){
-        this.ability("attack");
         target.defend(this.atk);
-        if (target.hp < 1){
-            this.ability("knockout");
-        }
-    }
+    }    
     defend(damage){
-        this.ability("defend");
         this.hp -= damage;
-        if (this.hp > 0){
-            this.ability("hurt");
-        } else {
-            this.ability("faint");
-        }
+        this.hitCount += 1;
     }
-    buy(){
-        this.ability("buy");
+}
+
+export class Sniper extends Pet{
+    constructor(addedHp, addedAtk, place, level, food){
+       super(2 + addedHp, 2 + addedAtk, snipe, place, level, food)
     }
-    sell(){
-        this.ability("sell");
+}
+
+export class Healer extends Pet{
+    constructor(addedHp, addedAtk, place, level, food){
+        super(8 + addedHp, 2 + addedAtk, addHealthOnFaint, place, level, food)
+    }
+}
+
+export class Berserker extends Pet{
+    constructor(addedHp, addedAtk, place, level, food){
+        super(6 + addedHp, 2 + addedAtk, gainAttackOnHurt, place, level, food)
+    }
+}
+
+export class Bomber extends Pet{
+    constructor(addedHp, addedAtk, place, level, food){
+        super(3 + addedHp, 2 + addedAtk, explodeOnFaint, place, level, food)
     }
 }
